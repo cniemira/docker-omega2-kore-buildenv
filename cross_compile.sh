@@ -3,6 +3,8 @@
 export STAGING_DIR="/lede/staging_dir"
 
 export BUILD_DIR="$1"
+shift
+
 if [ "$BUILD_DIR" = "" ]
 then
  echo "$0 BUILD_DIR"
@@ -49,14 +51,14 @@ KORE_LDFLAGS="-lcrypto -lssl"
 PYTHON_LDFLAGS="-lpython3.6 -ldl -lpthread -lm -lz -Xlinker -export-dynamic"
 TOOLCHAIN_LDFLAGS="-L$TOOLCHAIN_USR_LIB -L$TOOLCHAIN_LIB -L$TARGET_USR_LIB -L$TARGET_LIB $KORE_LDFLAGS $PYTHON_LDFLAGS"
 
-echo "Building in $BUILD_DIR:"
+echo "Cross compiling $BUILD_DIR:"
 echo "  CC=$TOOLCHAIN_CC"
 echo "  CXX=$TOOLCHAIN_CXX"
 echo "  LD=$TOOLCHAIN_LD"
 echo "  CFLAGS=$TOOLCHAIN_CFLAGS"
 echo "  LDFLAGS=$TOOLCHAIN_LDFLAGS"
-echo "  USER_LIBS=$USER_LIBS"
 
+cd $BUILD_DIR
 #make clean
 make \
     CC="$TOOLCHAIN_CC" \
@@ -64,4 +66,6 @@ make \
     LD="$TOOLCHAIN_LD" \
     CFLAGS="$TOOLCHAIN_CFLAGS" \
     LDFLAGS="$TOOLCHAIN_LDFLAGS" \
-    PYTHON=1
+    PREFIX="$TARGET" \
+    PYTHON=1 $@
+
